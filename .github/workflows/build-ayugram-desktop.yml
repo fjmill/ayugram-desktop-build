@@ -13,9 +13,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Install dependencies
+      - name: Fix broken or conflicting packages (containerd)
         run: |
+          sudo apt-get remove -y containerd containerd.io
           sudo apt-get update
+
+      - name: Install dependencies and Docker
+        run: |
           sudo apt-get install -y docker.io
           docker run -d --name arch-builder archlinux
 
