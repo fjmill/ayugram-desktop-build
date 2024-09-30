@@ -1,0 +1,40 @@
+name: Build ayugram-desktop AUR
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker.io
+          docker run -d --name arch-builder archlinux
+
+      - name: Update and install base-devel in Arch container
+        run: |
+          docker exec arch-builder pacman -Syu --noconfirm
+          docker exec arch-builder pacman -S --noconfirm base-devel git
+
+      - name: Clone AUR helper (yay) and install it
+        run: |
+          docker exec arch-builder git clone https://aur.archlinux.org/yay.git
+          docker exec arch-builder bash -c "cd yay && makepkg -si --noconfirm"
+
+      - name: Build ayugram-desktop
+        run: |
+          docker exec arch-builder yay -S ayugram-desktop --noconfirm
+
+      - name: Save Build Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: ayugram-desktop
+          path: /var/cache/pacman/pkg/*.zst
