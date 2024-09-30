@@ -34,7 +34,8 @@ jobs:
           docker exec arch-builder yay -S ayugram-desktop --noconfirm
 
       - name: Save Build Artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ayugram-desktop
           path: /var/cache/pacman/pkg/*.zst
+
